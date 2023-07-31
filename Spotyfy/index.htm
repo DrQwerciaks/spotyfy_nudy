@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listening to Spotify</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #3f3f3ff6;
+      overflow: hidden;
+    }
+
+    .spotify {
+      max-width: 400px;
+      background-color: #ffffffab;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title h1 {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .track_info {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .track_info img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-right: 20px;
+      animation: spin 5s linear infinite;
+    }
+
+    .track_text {
+      flex: 1;
+    }
+
+    .track_title a {
+      font-size: 18px;
+      color: #1DB954;
+      text-decoration: none;
+    }
+
+    .first_info a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    .proggress {
+      height: 10px;
+      background-color: #ccc;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    .proggress .current {
+      height: 100%;
+      background-color: #1DB954;
+      border-radius: 5px;
+    }
+
+    .time {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .controls button {
+      margin: 0 10px;
+      padding: 10px 15px;
+      background-color: #1DB954;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .volume-slider {
+      height: 100px;
+      writing-mode: bt-lr; /* IE */
+      -webkit-appearance: slider-vertical; /* WebKit */
+      width: 8px;
+      height: 100px;
+      padding: 0 5px;
+      border-radius: 5px; /* Zaokrąglenie suwaka */
+      transform: rotate(90deg); /* Obrót o 90 stopni */
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #1DB954;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #1DB954;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-runnable-track {
+      background: #1DB954;
+    }
+
+    .volume-slider::-moz-range-track {
+      background: #1DB954;
+    }
+
+    .track_info {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .track_info img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-right: 20px;
+    }
+
+    .volume-container {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .ball {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.7;
+      background: #17eb4c9c;
+    }
+    .controls button:active {
+      transform: scale(0.95); /* Skalowanie przycisku podczas kliknięcia */
+      transition: transform 0.1s; /* Animacja trwa 0.1 sekundy */
+    }
+    .sound-effect {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background: #1DB954;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translateX(-50%) scale(1.5);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+    }
+    .equalizer {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+    }
+
+    .equalizer-bar {
+      width: 20px;
+      height: 100%;
+      background: #1DB954;
+      animation: pulse 0.5s infinite;
+    }
+
+    .equalizer-bar:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .equalizer-bar:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .equalizer-bar:nth-child(4) {
+      animation-delay: 0.3s;
+    }
+    .equalizer-bar:nth-child(5) {
+      animation-delay: 0.6s;
+    }
+    .equalizer-bar:nth-child(6) {
+      animation-delay: 0.4s;
+    }
+    /* ... Dodaj więcej opóźnień dla dodatkowych słupków ... */
+  </style>
+</head>
+<body>
+  <div class="spotify">
+    <div class="title">
+      <h1 class="category_title">LISTENING TO SPOTIFY</h1>
+      <img src="spotify_logo.svg" alt="Spotify Logo">
+    </div>
+    
+    <div class="track_info">
+      <div class="volume-container">
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" orient="vertical">
+      </div>
+      <img id="track-logo" src="zdj1.png" alt="Album Cover">
+      <div class="track_text">
+        <span class="track_title"><a  target="_blank">ABBA</a></span>
+        <span class="first_info"> <a  target="_blank">Gimme! Gimme! Gimme!</a></span>
+      </div>
+    </div>
+    <div class="proggress">
+      <div class="current" style="width: 40%;"></div>
+    </div>
+    <div class="time">
+      <span id="first">0:00</span>
+      <span id="second">3:30</span>
+    </div>
+    <div class="controls">
+      <button id="backward-btn">&#9664;</button>
+      <button id="play-pause-btn">&#9658;</button>
+      <button id="forward-btn">&#9654;</button>
+    </div>
+  </div>
+  <div id="ball-container"></div>
+  <video id="video-player" src="video.mp4" controls loop muted></video>
+  <div class="equalizer">
+    <div class="equalizer-bar"></div>
+    <div class="equalizer-bar"></div>
+    <div class="equalizer-bar"></div>
+    <div class="equalizer-bar"></div>
+    <div class="equalizer-bar"></div>
+    <div class="equalizer-bar"></div>
+  <script>
+    const audio = new Audio();
+    const videoPlayer = document.getElementById('video-player');
+    videoPlayer.style.display = 'none';
+
+    let currentTrack = 1;
+
+    const tracks = [
+      {
+        title: 'ABBA',
+        artist: 'Gimme! Gimme! Gimme!',
+        url: 'muzyka.mp3',
+        video: 'video.mp4',
+        logo: 'zdj1.png'
+      },
+      {
+        title: 'Eminem',
+        artist: 'Without Me',
+        url: 'muzyka2.mp3',
+        video: 'video2.mp4',
+        logo: 'zdj2.jpg'
+      }
+      // Add more tracks here if needed
+    ];
+
+    function updateTrackInfo() {
+        const trackTitleElement = document.querySelector('.track_title a');
+        const trackArtistElement = document.querySelector('.first_info a');
+        const trackLogoElement = document.getElementById('track-logo');
+
+        trackTitleElement.textContent = tracks[currentTrack - 1].title;
+        trackArtistElement.textContent = `by ${tracks[currentTrack - 1].artist}`;
+        trackLogoElement.src = tracks[currentTrack - 1].logo;
+      }
+
+      function playPause() {
+        if (audio.paused) {
+          audio.play();
+          videoPlayer.play();
+          videoPlayer.setAttribute('autoplay', 'autoplay');
+          document.getElementById('play-pause-btn').textContent = '||';
+        } else {
+          audio.pause();
+          videoPlayer.pause();
+          document.getElementById('play-pause-btn').textContent = '>';
+        }
+      }
+
+      function playNextTrack() {
+        currentTrack = (currentTrack % tracks.length) + 1;
+        audio.src = tracks[currentTrack - 1].url;
+        videoPlayer.src = tracks[currentTrack - 1].video;
+        audio.play();
+        videoPlayer.play();
+        updateTrackInfo();
+      }
+
+      function playPreviousTrack() {
+        currentTrack = (currentTrack - 2 + tracks.length) % tracks.length + 1;
+        audio.src = tracks[currentTrack - 1].url;
+        videoPlayer.src = tracks[currentTrack - 1].video;
+        audio.play();
+        videoPlayer.play();
+        updateTrackInfo();
+      }
+
+      function updateTime() {
+        const currentTimeElement = document.getElementById('first');
+        const totalTimeElement = document.getElementById('second');
+        const progressBarElement = document.querySelector('.proggress .current');
+        currentTimeElement.textContent = formatTime(audio.currentTime);
+        if(audio.duration) {
+          totalTimeElement.textContent = formatTime(audio.duration);
+        }
+        progressBarElement.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+      }
+
+      function formatTime(timeInSeconds) {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      function updateVolume() {
+        const volumeSlider = document.getElementById('volume-slider');
+        audio.volume = volumeSlider.value;
+      }
+
+      document.getElementById('backward-btn').addEventListener('click', playPreviousTrack);
+      document.getElementById('play-pause-btn').addEventListener('click', playPause);
+      document.getElementById('forward-btn').addEventListener('click', playNextTrack);
+      document.getElementById('volume-slider').addEventListener('input', updateVolume);
+
+      audio.addEventListener('timeupdate', updateTime);
+      audio.addEventListener('loadedmetadata', updateTime);
+      audio.src = tracks[currentTrack - 1].url;
+      videoPlayer.src = tracks[currentTrack - 1].video;
+
+      const numBalls = 150;
+    const ballContainer = document.getElementById('ball-container');
+
+    for (let i = 0; i < numBalls; i++) {
+      const ball = document.createElement('div');
+      ball.classList.add('ball');
+      ball.style.width = `${Math.random() * 10 + 10}px`;
+      ball.style.height = ball.style.width;
+      ball.style.left = `${Math.random() * 100}%`;
+      ball.style.top = `${Math.random() * 100}%`;
+      ball.dataset.isMovable = Math.random() > 0.5 ? 'true' : 'false'; // Dodajemy losowość do tego, czy kula jest ruchoma
+      ballContainer.appendChild(ball);
+    }
+
+    document.body.addEventListener('mousemove', (event) => {
+      const balls = document.querySelectorAll('.ball');
+      balls.forEach((ball, index) => {
+        if (ball.dataset.isMovable === 'true') { // Sprawdzamy, czy kula jest ruchoma
+          const speed = index / balls.length;
+          const x = event.clientX * speed;
+          const y = event.clientY * speed;
+          ball.style.transform = `translate(${x}px, ${y}px)`;
+        }
+      });
+    });
+    </script>
+</body>
+</html>
